@@ -6,21 +6,23 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// Conexión a MongoDB Bitnami (LOCAL)
+// Servir páginas estáticas (index.html)
+app.use(express.static("public"));
+
+// Conexión MongoDB Bitnami
 mongoose
   .connect("mongodb://127.0.0.1:27017/testdb")
   .then(() => console.log("MongoDB conectado"))
   .catch((err) => console.error("Error MongoDB:", err));
 
-// Esquema simple
+// Modelo
 const UserSchema = new mongoose.Schema({
   nombre: String,
   email: String,
 });
-
 const User = mongoose.model("User", UserSchema);
 
-// Rutas
+// Rutas API
 app.post("/api/users", async (req, res) => {
   try {
     const nuevo = await User.create(req.body);
