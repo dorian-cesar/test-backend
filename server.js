@@ -1,3 +1,5 @@
+require("dotenv").config(); // cargar variables .env
+
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -6,12 +8,21 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// Servir páginas estáticas (index.html)
+// Servir archivos estáticos (HTML, JS, CSS)
 app.use(express.static("public"));
 
-// Conexión MongoDB Bitnami
+// Variables desde .env
+const USER = process.env.MONGO_USER;
+const PASS = process.env.MONGO_PASS;
+const DB = process.env.MONGO_DB;
+const PORT = process.env.PORT || 3000;
+
+// Conexión segura a MongoDB con autenticación
+const uri = `mongodb://${USER}:${PASS}@127.0.0.1:27017/${DB}?authSource=admin`;
+
+// Conexión a Mongo
 mongoose
-  .connect("mongodb://127.0.0.1:27017/testdb")
+  .connect(uri)
   .then(() => console.log("MongoDB conectado"))
   .catch((err) => console.error("Error MongoDB:", err));
 
@@ -22,7 +33,7 @@ const UserSchema = new mongoose.Schema({
 });
 const User = mongoose.model("User", UserSchema);
 
-// Rutas API
+// ENDPOINTS API
 app.post("/api/users", async (req, res) => {
   try {
     const nuevo = await User.create(req.body);
@@ -37,5 +48,4 @@ app.get("/api/users", async (req, res) => {
   res.json(users);
 });
 
-const PORT = 3000;
-app.listen(PORT, () => console.log(`Servidor corriendo en puerto ${PORT}`));
+app.listen(PORT, () => console.log(`Servidor ejecutándose en puerto ${PORT}`));
