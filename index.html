@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Formulario Test</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body class="bg-light">
+
+<div class="container mt-5">
+  <h3 class="mb-4">Formulario de Test (Node + Mongo)</h3>
+
+  <form id="testForm" class="card p-4 shadow-sm">
+    <div class="mb-3">
+      <label class="form-label">Nombre</label>
+      <input type="text" class="form-control" id="nombre" required>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Email</label>
+      <input type="email" class="form-control" id="email" required>
+    </div>
+
+    <button class="btn btn-primary w-100" type="submit">Enviar</button>
+  </form>
+
+  <hr>
+
+  <h4>Usuarios registrados:</h4>
+  <ul id="lista" class="list-group"></ul>
+</div>
+
+<script>
+const API = "http://TU_IP_PUBLICA:3000/api/users";
+
+// Enviar datos
+document.getElementById("testForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const data = {
+    nombre: document.getElementById("nombre").value,
+    email: document.getElementById("email").value
+  };
+
+  const res = await fetch(API, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
+
+  const json = await res.json();
+  if (json.ok) {
+    alert("Usuario guardado!");
+    cargarUsuarios();
+  } else {
+    alert("Error: " + json.error);
+  }
+});
+
+// Cargar usuarios
+async function cargarUsuarios() {
+  const res = await fetch(API);
+  const data = await res.json();
+
+  const lista = document.getElementById("lista");
+  lista.innerHTML = "";
+
+  data.forEach(u => {
+    const li = document.createElement("li");
+    li.className = "list-group-item";
+    li.textContent = `${u.nombre} - ${u.email}`;
+    lista.appendChild(li);
+  });
+}
+
+cargarUsuarios();
+</script>
+
+</body>
+</html>
